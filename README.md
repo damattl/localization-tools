@@ -1,11 +1,19 @@
-### WARNING
-This is an old README.md Version.
-It will be updated soon.
+### Installation
 
+Add the following to your pubspec.yaml under the **dev_dependencies**
+```yaml
+dev_dependencies:
+  localization_tools:
+    git:
+      url: "https://github.com/damattl/localization-tools.git"
+```
+Then run
+```shell
+dart run pub get
+```
+<br>
 
-<b>Installation</b>
-
-Before running the script you need to add the *translator-config.json* to the same directory as the _README.md_ file. There you have to add following json: <br>
+If you plan to use the translator you need to add the *translator-config.json* to the base of your project dir / working dir. There you have to add following json: <br>
 ```yaml
 {
    "auth_key": "YOUR_PERSONAL_DEEPL_AUTH_KEY",
@@ -32,7 +40,7 @@ If you don't have an <code>auth_key</code> create an DeepL-Account first:
 <br>
 
 
-<b>Use the script</b>
+### Supported json syntax guide
 
 Add a new tag to the specified base language file (file to be translated) like this: <br>
 ```yaml
@@ -52,25 +60,39 @@ To specify that a given tag should not be overwritten in some output files, use 
 ```
 At the time being, it is not possible to disable overwrite for multiple languages
 
-Then open a console and type <br>
-<code>dart run bin/translation_script.dart<br>
--d LANGUAGE_FILE_DIR <br>
--b LANGUAGE_BASE_FILE <br>
--c LANGUAGE_FILE_TO_COMPARE_AGAINST
-</code> <br>
-to run the script.
+### Using the translator
 
-From the <code>translation-script</code> directory this resolves to: <br>
-<code>dart run bin/translation_script.dart -d ../assets/lang -b base.json -c de-DE.json</code>
+Run the translator with the following command <br>
+```shell
+dart run localization_tools -d LANGUAGE_FILES_DIR translate
+-b BASE_FILE
+-c FILE_TO_COMPARE_AGAINST
+```
+If you omit the input flags, the default values are used instead. <br>
+<table>
+<tr>
+<th>Flag</th><th>Description</th><th>Default</th>
+</tr>
+<tr>
+<td>-d</td><td>Directory where the translation files are stored</td><td>/assets/lang</td>
+</tr>
+<tr>
+<td>-b</td><td>The base file</td><td>base.json</td>
+</tr>
+<tr>
+<td>-c</td><td>The file to compare the base file against</td><td>de-DE.json</td>
+</tr>
+</table>
 
-The missing language-tags will now be added to the other files.
+
+Missing language-tags will automatically be added to the other files.
 <br>
 <br>
 **IMPORTANT:** The base file and the file you compare against, should always be of the same language - otherwise all
 keys will be marked as changed!
 
 
-<b>VS Code</b>
+#### VS Code
 
 To launch the script with one click add following lines to your <code>launch.json</code> (via _Run -> Add Configuration_):
 
@@ -81,10 +103,11 @@ To launch the script with one click add following lines to your <code>launch.jso
             "type": "dart",
 
             "request": "launch",
-            "program": "bin/translation_script.dart",
+            "program": "localization_tools",
             "args": [
                 "-d",
                 "../assets/lang",
+                "translate"
                 "-b",
                 "base.json",
                 "-c",
@@ -98,12 +121,40 @@ To launch the script with one click add following lines to your <code>launch.jso
 ```
 
 
-<b>Android Studio</b>
+#### Android Studio / InteliJ
 
-Add new Configuration via _Run -> Edit Configurations... -> + -> Shell Script_
-Select _Script text_ as execution mode and add <code>dart run bin/translation_script.dart -d ../assets/lang -b base.json -c de-DE.json</code> <br>
-Set the working directory to the scripts base directory _translation-script_
-<br>
+Add new Configuration via <br>
+_Run -> Edit Configurations... -> + -> Shell Script_ <br>
+Select _Script text_ as execution mode and add:
+```shell
+dart run localization_tools -d ../assets/lang translate -b base.json -c de-DE.json
+``` 
 <br>
 
-Have fun translating! :)
+
+### Key Generator
+To use the key generator run:
+```shell
+dart run localization_tools -d LANGUAGE_FILES_DIR keys
+-b BASE_FILE
+-o OUTPUT_DIR
+-n OUTPUT_NAME
+```
+If you omit the input flags, the default values are used instead. <br>
+<table>
+<tr>
+<th>Flag</th><th>Description</th><th>Default</th>
+</tr>
+<tr>
+<td>-d</td><td>Directory where the translation files are stored</td><td>/assets/lang</td>
+</tr>
+<tr>
+<td>-b</td><td>The base file</td><td>base.json</td>
+</tr>
+<tr>
+<td>-o</td><td>The output directory for the generated file</td><td>lib/generated</td>
+</tr>
+<tr>
+<td>-n</td><td>The name of the generated file</td><td>translation_keys.g.dart</td>
+</tr>
+</table>

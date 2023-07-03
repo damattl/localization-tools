@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:dart_style/dart_style.dart';
 import 'package:localization_tools/utils/flatten.dart';
 import 'package:localization_tools/utils/language_entry.dart';
 
@@ -63,10 +64,13 @@ Future<void> generateKeysFile(Map<String, dynamic> keyMap, String outputPath) as
   mapStr = mapStr.replaceAll(RegExp(r'(?<=[A-Z a-z0-9]),'), "',");
   mapStr = mapStr.replaceAll(RegExp(r'(?<=[A-Za-z0-9])\)'), "')");
 
+
   final content = "const translationKeys = $mapStr;";
 
+  final formatted = DartFormatter().format(content);
+
   await File(outputPath).create(recursive: true);
-  await File(outputPath).writeAsString(content);
+  await File(outputPath).writeAsString(formatted);
 
 }
 

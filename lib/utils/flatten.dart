@@ -18,6 +18,22 @@ Map<String, LanguageEntry> flattenMap(
   return flattened;
 }
 
+String sanitizeNode(String node) {
+  node = node.replaceAll("-", "_");
+  final nodeSplits = node.split("_");
+
+  final buffer = StringBuffer();
+  for (int i = 0; i < nodeSplits.length; i++) {
+    final split = nodeSplits[i];
+    if (i == 0) {
+      buffer.write(split);
+      continue;
+    }
+    buffer.writeAll([split.substring(0, 1).toUpperCase(), split.substring(1)]);
+  }
+  return buffer.toString();
+}
+
 void mapFromNodes(
   Map<String, dynamic> prevMap,
   List<String> nodes,
@@ -27,7 +43,7 @@ void mapFromNodes(
 }) {
   String node = nodes[index];
   if (sanitize) {
-    node = node.replaceAll("-", "_");
+    node = sanitizeNode(node);
   }
 
   if (index == nodes.length - 1) {

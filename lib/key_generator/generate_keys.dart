@@ -6,20 +6,20 @@ import 'package:dart_style/dart_style.dart';
 import 'package:localization_tools/utils/flatten.dart';
 import 'package:localization_tools/utils/language_entry.dart';
 
-
 import 'package:path/path.dart' as path;
-
 
 Future<void> generateKeys(ArgResults args, String baseDir) async {
   if (args["base"] == null || args["output"] == null || args["name"] == null) {
-    stderr.writeln("Not enough arguments specified! Type --help or -h for more information.");
+    stderr.writeln(
+        "Not enough arguments specified! Type --help or -h for more information.");
     stdout.writeln("Press enter to exit");
     stdin.readLineSync();
     return;
   }
 
   if (!Directory(baseDir).existsSync()) {
-    stdout.writeln("Could not find the directory specified for the language files: '${args["dir"]}'");
+    stdout.writeln(
+        "Could not find the directory specified for the language files: '${args["dir"]}'");
     stdout.writeln("Press enter to exit");
     stdin.readLineSync();
     return;
@@ -40,12 +40,12 @@ Future<void> generateKeys(ArgResults args, String baseDir) async {
 
   final flattened = flattenMap(jsonData, [], {});
   final keyMap = generateKeyMap(flattened);
-  await generateKeysFile(keyMap, fullOutputPath);
+
+  await generateKeysFile(keyMap, flattened, fullOutputPath);
 
   stdout.writeln("Successfully generated keys. Exiting now..");
   sleep(Duration(seconds: 5));
 }
-
 
 Map<String, dynamic> generateKeyMap(Map<String, LanguageEntry> flattened) {
   final keyMap = <String, dynamic>{};
@@ -56,7 +56,8 @@ Map<String, dynamic> generateKeyMap(Map<String, LanguageEntry> flattened) {
   return keyMap;
 }
 
-Future<void> generateKeysFile(Map<String, dynamic> keyMap, String outputPath) async {
+Future<void> generateKeysFile(Map<String, dynamic> keyMap,
+    Map<String, LanguageEntry> flattened, String outputPath) async {
   String mapStr = keyMap.toString();
   mapStr = mapStr.replaceAll("{", "(");
   mapStr = mapStr.replaceAll("}", ")");
@@ -64,6 +65,12 @@ Future<void> generateKeysFile(Map<String, dynamic> keyMap, String outputPath) as
   mapStr = mapStr.replaceAll(RegExp(r'(?<=[A-Z a-z0-9]),'), "',");
   mapStr = mapStr.replaceAll(RegExp(r'(?<=[A-Za-z0-9])\)'), "')");
 
+  for (final entry in flattened.entries) {
+    mapStr = mapStr.replaceFirst(
+        "'${entry.key}',", "'${entry.key}', // ${entry.value.value}\n");
+    mapStr = mapStr.replaceFirst(
+        "'${entry.key}')", "'${entry.key}' // ${entry.value.value}\n)");
+  }
 
   final content = "const translationKeys = $mapStr;";
 
@@ -71,6 +78,4 @@ Future<void> generateKeysFile(Map<String, dynamic> keyMap, String outputPath) as
 
   await File(outputPath).create(recursive: true);
   await File(outputPath).writeAsString(formatted);
-
 }
-
